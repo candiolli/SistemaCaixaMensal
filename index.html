@@ -1,0 +1,183 @@
+<html ng-app="listaTelefonica">
+<head>
+	<meta charset="UTF-8">
+	<title>Caixa Mensal</title>
+	
+	<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css">
+		
+	<style type="text/css">
+		.jumbotron {
+			min-height:400px;
+			float:left;
+			margin-right: auto;
+			margin-left: auto;
+			margin-top: 20px;
+		}
+
+		.form-control {
+			margin-top: 5px;
+		}
+
+		.selecionado {
+			background-color: yellow;
+		}
+
+		.negrito {
+			font-weight: bold;
+		}
+		
+		.table {
+			width:350px;
+			font-size:12px;
+		}
+		
+		.input-descricao {
+			width:210px;
+			float:left;
+			margin-right:3px;
+		}
+		
+		.input-value {
+			width:80px;
+			float:left;
+			margin-right:3px;
+		}
+	</style>
+
+	<script src="angular-1.3.15/angular.js"></script>
+	<script src="angular-1.3.15/angular-messages.js"></script>
+	<script>
+		angular.module("listaTelefonica", []);
+		angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function($scope){
+			$scope.blocoSaidas = "Saídas";
+			
+			$scope.blocoEntradas = "Entradas";
+			
+			$scope.blocoTotal = "Total";
+			
+			$scope.totalDespesas = 0;
+			$scope.totalEntradas = 0;
+			
+			$scope.despesas = [
+				{descricao: "Plano de saúde", valor: 300},
+				{descricao: "Luz", valor: 100},
+				{descricao: "Net (TV, fone, internet)", valor: 245}
+			];
+			
+			$scope.entradas = [
+				{descricao: "Salário", valor: 1200},
+				{descricao: "Aluguel AP", valor: 500}
+			];
+			
+			$scope.addDesp = function(desp) {
+				$scope.despesas.push(angular.copy(desp));
+				delete $scope.desp;
+			};
+			
+			$scope.addEntrada = function(entrada) {
+				$scope.entradas.push(angular.copy(entrada));
+				delete $scope.entrada;
+			};
+			
+			
+			$scope.getTotalDespesas = function(){
+				var total = 0;
+				for(var i = 0; i < $scope.despesas.length; i++){
+					var desp = $scope.despesas[i];
+					total += Number(desp.valor);
+				}
+				$scope.totalDespesas = total;
+				return total;
+			}
+			
+			$scope.getTotalEntradas = function(){
+				var total = 0;
+				for(var i = 0; i < $scope.entradas.length; i++){
+					var entr = $scope.entradas[i];
+					total += Number(entr.valor);
+				}
+				$scope.totalEntradas = total;
+				return total;
+			}
+			
+					
+			$scope.apagarContatos = function(contatos) {
+				$scope.contatos = contatos.filter(function(contato){
+					if (!contato.selecionado) return contato;
+				});
+			};
+			$scope.isContatoSelecionado = function(contatos) {
+				return contatos.some(function(contato){
+					return contato.selecionado;
+				});
+			};
+			
+
+		});
+	</script>
+</head>
+<body ng-controller="listaTelefonicaCtrl">
+	
+	<div class="jumbotron">
+	
+		<table class="table" ng-show="despesas.length > 0">
+			<tr>
+				<th></th>
+				<th><h4>{{blocoSaidas}}</h4></th>
+				<th><h4>{{getTotalDespesas() | number:2}}</h4></th>
+			</tr>
+			<tr ng-repeat="desp in despesas" ng-class="{'selecionado negrito': desp.selecionado}">
+				<td><input type="checkbox" ng-model="desp.selecionado"></input></td>
+				<td>{{desp.descricao}}</td>
+				<td>{{desp.valor | number:2}}</td>
+			</tr>
+		</table>		
+		<form name="despForm">
+			<input type="text" ng-model="desp.descricao" class="form-control input-descricao" ng-required="true" />
+			<input type="text" ng-model="desp.valor" class="form-control input-value" ng-required="true" />
+			<button class="btn btn-primary" style="margin-top: 5px;" ng-click="addDesp(desp)" ng-disabled="!desp.descricao || !desp.valor">Add</button>
+		</form>
+		
+	</div>
+	
+	<div class="jumbotron">				
+		<table class="table" ng-show="entradas.length > 0">
+			<tr>
+				<th></th>
+				<th><h4>{{blocoEntradas}}</h4></th>
+				<th><h4>{{getTotalEntradas() | number:2}}</h4></th>
+			</tr>
+			<tr ng-repeat="desp in entradas" ng-class="{'selecionado negrito': desp.selecionado}">
+				<td><input type="checkbox" ng-model="desp.selecionado"></input></td>
+				<td>{{desp.descricao}}</td>
+				<td>{{desp.valor}}</td>
+			</tr>
+		</table>
+		<form name="entradaForm">
+			<input type="text" ng-model="entrada.descricao" class="form-control input-descricao" ng-required="true" />
+			<input type="text" ng-model="entrada.valor" class="form-control input-value" ng-required="true" />
+			<button class="btn btn-primary" style="margin-top: 5px;" ng-click="addEntrada(entrada)" ng-disabled="!entrada.descricao || !entrada.valor">Add</button>
+		</form>
+	</div>
+	
+	<div class="jumbotron">
+		<table class="table">
+			<tr>
+				<th><h4>{{blocoTotal}}</h4></th>
+				<th><h4></h4></th>
+			</tr>
+			<tr>
+				<td>Saldo para Dezembro</td>
+				<td>{{totalEntradas - totalDespesas}}</td>
+			</tr>
+			<tr>
+				<td>Saldo de Novembro</td>
+				<td>1100,00</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div ng-include="'footer.html'"></div>
+
+</body>
+</html>
